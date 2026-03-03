@@ -218,6 +218,16 @@ vim.g.mapleader = " "
 | `Space+k` | Next location list item |
 | `Space+s` | Search and replace word under cursor |
 
+### Telescope operations
+
+Fuzzy finding with Telescope:
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+p` | Find files |
+| `Space+ff` | Live grep (search in files) |
+| `Space+vh` | Search help tags |
+
 ## Key plugins
 
 The configuration includes these essential plugins:
@@ -230,6 +240,29 @@ The configuration includes these essential plugins:
 - **gitsigns** - Git integration
 - **neogit** - Git client
 - **fidget.nvim** - LSP progress UI
+
+## Color scheme
+
+The configuration uses **Rosé Pine** as the default color scheme with transparency enabled:
+
+```lua .config/nvim/lua/plugins/colors.lua
+require('rose-pine').setup({
+  disable_background = true,
+  styles = {
+    italic = false,
+  },
+})
+
+vim.cmd.colorscheme("rose-pine")
+```
+
+Alternative color schemes are also included but not active:
+- **Catppuccin Mocha** - Warm, pastel color scheme
+- **Tokyo Night Storm** - Dark blue theme
+
+<Info>
+  The configuration disables the background color to allow terminal transparency to show through.
+</Info>
 
 ## Diagnostic configuration
 

@@ -1,0 +1,278 @@
+---
+title: Neovim configuration
+description: Comprehensive Neovim setup with LSP support for multiple languages
+---
+
+## Overview
+
+This Neovim configuration uses [Lazy.nvim](https://github.com/folke/lazy.nvim) as the plugin manager and includes full LSP support for multiple programming languages, intelligent code completion, and modern development tools.
+
+## Plugin manager
+
+The configuration uses Lazy.nvim for plugin management. It's automatically bootstrapped on first run:
+
+```lua .config/nvim/init.lua
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+require("init")
+require("lazy").setup("plugins")
+```
+
+## LSP configuration
+
+### Supported language servers
+
+The configuration includes automatic installation and setup for these LSP servers:
+
+<CardGroup cols={2}>
+  <Card title="lua_ls" icon="moon">
+    Lua language server with Neovim-specific configuration
+  </Card>
+  <Card title="gopls" icon="golang">
+    Go language server with auto-imports and completion
+  </Card>
+  <Card title="clangd" icon="c">
+    C/C++ language server
+  </Card>
+  <Card title="elixirls" icon="droplet">
+    Elixir language server
+  </Card>
+  <Card title="ts_ls" icon="js">
+    TypeScript/JavaScript language server
+  </Card>
+  <Card title="tailwindcss" icon="palette">
+    Tailwind CSS IntelliSense
+  </Card>
+  <Card title="pyright" icon="python">
+    Python static type checker and language server
+  </Card>
+</CardGroup>
+
+### LSP setup details
+
+<Tabs>
+  <Tab title="Lua">
+    ```lua
+    lspconfig.lua_ls.setup {
+      capabilities = capabilities,
+      settings = {
+        Lua = {
+          runtime = { version = "Lua 5.1" },
+          diagnostics = {
+            globals = { "vim", "it", "describe", "before_each", "after_each" },
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Go">
+    ```lua
+    lspconfig.gopls.setup {
+      capabilities = capabilities,
+      cmd = {"gopls"},
+      filetypes = {"go", "gomod", "gowork", "gotmpl"},
+      root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+      settings = {
+        gopls = {
+          completeUnimported = true,
+          usePlaceholders = true,
+          analyses = {
+            unusedparams = true,
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```lua
+    lspconfig.pyright.setup {
+      root_dir = util.root_pattern("pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile", "pyrightconfig.json", ".git"),
+      single_file_support = true,
+      settings = {
+        python = {
+          analysis = {
+            autoSearchPaths = true,
+            useLibraryCodeForTypes = true,
+          }
+        },
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Completion
+
+The configuration uses nvim-cmp with multiple sources for intelligent code completion:
+
+```lua
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      require('luasnip').lsp_expand(args.body)
+    end,
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+    ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+    ["<C-Space>"] = cmp.mapping.complete(),
+  }),
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' },
+  }, {
+    { name = 'buffer' },
+  })
+})
+```
+
+### Completion keybindings
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+p` | Select previous item |
+| `Ctrl+n` | Select next item |
+| `Ctrl+y` | Confirm selection |
+| `Ctrl+Space` | Trigger completion |
+
+## Editor settings
+
+Core editor configuration from `.config/nvim/lua/set.lua`:
+
+```lua
+vim.opt.nu = true              -- Line numbers
+vim.opt.rnu = true             -- Relative line numbers
+
+vim.opt.tabstop = 2            -- Tab width
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true       -- Use spaces instead of tabs
+
+vim.opt.smartindent = true     -- Smart indentation
+vim.opt.wrap = false           -- No line wrapping
+
+vim.opt.swapfile = false       -- No swap files
+vim.opt.backup = false         -- No backup files
+
+vim.opt.hlsearch = false       -- Don't highlight search results
+vim.opt.incsearch = true       -- Incremental search
+
+vim.opt.termguicolors = true   -- True color support
+vim.opt.scrolloff = 8          -- Keep 8 lines visible when scrolling
+vim.opt.colorcolumn = "80"     -- Show column at 80 characters
+```
+
+## Keybindings
+
+### Leader key
+
+The leader key is set to **Space**:
+
+```lua
+vim.g.mapleader = " "
+```
+
+### Navigation and editing
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `Space+pv` | Normal | Open file explorer |
+| `J` (visual) | Visual | Move selection down |
+| `K` (visual) | Visual | Move selection up |
+| `Ctrl+d` | Normal | Scroll down (centered) |
+| `Ctrl+u` | Normal | Scroll up (centered) |
+| `n` | Normal | Next search result (centered) |
+| `N` | Normal | Previous search result (centered) |
+
+### Clipboard operations
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `Space+y` | Normal/Visual | Yank to system clipboard |
+| `Space+Y` | Normal | Yank line to system clipboard |
+| `Space+p` | Visual | Paste without replacing buffer |
+| `Space+d` | Normal/Visual | Delete without yanking |
+
+### LSP operations
+
+| Key | Action |
+|-----|--------|
+| `Space+f` | Format current buffer |
+| `Ctrl+j` | Previous quickfix item |
+| `Ctrl+k` | Next quickfix item |
+| `Space+j` | Previous location list item |
+| `Space+k` | Next location list item |
+| `Space+s` | Search and replace word under cursor |
+
+## Key plugins
+
+The configuration includes these essential plugins:
+
+- **nvim-lspconfig** - LSP client configuration
+- **mason.nvim** - LSP server installer
+- **nvim-cmp** - Completion engine
+- **telescope.nvim** - Fuzzy finder
+- **treesitter** - Syntax highlighting and parsing
+- **gitsigns** - Git integration
+- **neogit** - Git client
+- **fidget.nvim** - LSP progress UI
+
+## Diagnostic configuration
+
+Diagnostics are shown in floating windows with rounded borders:
+
+```lua
+vim.diagnostic.config({
+  float = {
+    focusable = false,
+    style = "minimal",
+    border = "rounded",
+    source = "always",
+    header = "",
+    prefix = "",
+  },
+})
+```
+
+<Note>
+  All LSP servers are automatically installed on first launch through Mason. No manual installation required.
+</Note>
+
+## File structure
+
+The Neovim configuration is organized as follows:
+
+```
+.config/nvim/
+├── init.lua              # Entry point, loads Lazy.nvim
+├── lazy-lock.json        # Plugin version lockfile
+└── lua/
+    ├── init.lua          # Core initialization
+    ├── set.lua           # Editor settings
+    ├── remap.lua         # Keybindings
+    ├── plugins.lua       # Plugin list
+    └── plugins/          # Individual plugin configs
+        ├── lsp-config.lua
+        ├── telescope.lua
+        ├── treesitter.lua
+        ├── colors.lua
+        └── ...
+```
+
+<Tip>
+  After deploying the configuration, run `:Lazy sync` in Neovim to install all plugins.
+</Tip>

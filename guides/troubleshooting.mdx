@@ -1,0 +1,507 @@
+---
+title: Troubleshooting
+description: Common issues and solutions for dotfiles installation and usage across different systems
+---
+
+This guide covers common problems you might encounter and their solutions.
+
+## Installation issues
+
+### Stow conflicts
+
+**Problem:** `stow` reports conflicts when trying to create symlinks.
+
+```bash
+WARNING! stowing . would cause conflicts:
+  * existing target is neither a link nor a directory: .zshrc
+```
+
+**Solution:**
+
+<Steps>
+  <Step title="Backup existing configs">
+    Move your existing dotfiles to a backup directory:
+    ```bash
+    mkdir ~/dotfiles_backup
+    mv ~/.zshrc ~/dotfiles_backup/
+    mv ~/.config/i3 ~/dotfiles_backup/
+    ```
+  </Step>
+  
+  <Step title="Run stow again">
+    ```bash
+    cd ~/dotfiles
+    stow .
+    ```
+  </Step>
+  
+  <Step title="Merge custom settings">
+    Review your backed-up configs and merge any custom settings into the new dotfiles.
+  </Step>
+</Steps>
+
+<Warning>
+  Never run `stow --adopt` unless you understand it will modify your repository files.
+</Warning>
+
+### Permission denied errors
+
+**Problem:** Permission errors when creating symlinks or accessing config directories.
+
+```bash
+stow: cannot create directory: Permission denied
+```
+
+**Solutions:**
+
+<Tabs>
+  <Tab title="Fix ownership">
+    Ensure you own your home directory:
+    ```bash
+    sudo chown -R $USER:$USER ~
+    ```
+  </Tab>
+  
+  <Tab title="Check parent directories">
+    Create parent directories if they don't exist:
+    ```bash
+    mkdir -p ~/.config
+    mkdir -p ~/Pictures/Screenshots
+    mkdir -p ~/Pictures/wallpapers
+    ```
+  </Tab>
+  
+  <Tab title="Avoid sudo with stow">
+    Never run `stow` with sudo. It should always be run as your regular user.
+  </Tab>
+</Tabs>
+
+### Git clone issues
+
+**Problem:** SSH key not set up or HTTPS authentication fails.
+
+**Solution:**
+
+```bash
+# Use HTTPS instead of SSH
+git clone https://github.com/jassuwu/dotfiles.git ~/dotfiles
+
+# Or set up SSH keys
+ssh-keygen -t ed25519 -C "your_email@example.com"
+cat ~/.ssh/id_ed25519.pub  # Add this to GitHub
+```
+
+## Missing dependencies
+
+### Zsh and Oh-My-Zsh
+
+**Problem:** Shell doesn't look right or plugins fail to load.
+
+**Install Zsh:**
+
+<Tabs>
+  <Tab title="Ubuntu/Debian">
+    ```bash
+    sudo apt update
+    sudo apt install zsh
+    chsh -s $(which zsh)
+    ```
+  </Tab>
+  
+  <Tab title="macOS">
+    ```bash
+    brew install zsh
+    chsh -s /bin/zsh
+    ```
+  </Tab>
+  
+  <Tab title="Arch Linux">
+    ```bash
+    sudo pacman -S zsh
+    chsh -s /usr/bin/zsh
+    ```
+  </Tab>
+</Tabs>
+
+**Install Oh-My-Zsh:**
+
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+**Install Powerlevel10k theme:**
+
+```bash
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
+  ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+```
+
+**Install Zsh plugins:**
+
+```bash
+# zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-autosuggestions \
+  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+# zsh-syntax-highlighting
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
+  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+```
+
+### i3 window manager (Linux)
+
+**Problem:** i3 fails to start or displays errors.
+
+**Install i3 and dependencies:**
+
+<Tabs>
+  <Tab title="Ubuntu/Debian">
+    ```bash
+    sudo apt install i3 i3status i3lock dmenu
+    sudo apt install picom feh maim xclip xdotool
+    sudo apt install brightnessctl  # For laptop brightness control
+    ```
+  </Tab>
+  
+  <Tab title="Arch Linux">
+    ```bash
+    sudo pacman -S i3-wm i3status i3lock dmenu
+    sudo pacman -S picom feh maim xclip xdotool
+    sudo pacman -S brightnessctl
+    ```
+  </Tab>
+  
+  <Tab title="Fedora">
+    ```bash
+    sudo dnf install i3 i3status i3lock dmenu
+    sudo dnf install picom feh maim xclip xdotool
+    sudo dnf install brightnessctl
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  After installation, log out and select i3 from your display manager's session menu.
+</Note>
+
+### WezTerm terminal
+
+**Problem:** WezTerm not found or config fails to load.
+
+**Install WezTerm:**
+
+<Tabs>
+  <Tab title="macOS">
+    ```bash
+    brew install --cask wezterm
+    ```
+  </Tab>
+  
+  <Tab title="Ubuntu/Debian">
+    ```bash
+    curl -LO https://github.com/wez/wezterm/releases/download/latest/wezterm-latest.deb
+    sudo dpkg -i wezterm-latest.deb
+    ```
+  </Tab>
+  
+  <Tab title="Arch Linux">
+    ```bash
+    sudo pacman -S wezterm
+    ```
+  </Tab>
+</Tabs>
+
+**Problem:** Fonts not displaying correctly.
+
+```bash
+# Install Nerd Fonts
+brew tap homebrew/cask-fonts
+brew install --cask font-fira-code-nerd-font
+brew install --cask font-comic-code-ligatures
+
+# Or download manually from https://www.nerdfonts.com/
+```
+
+### Neovim
+
+**Problem:** Neovim version too old or plugins fail.
+
+**Install latest Neovim:**
+
+<Tabs>
+  <Tab title="macOS">
+    ```bash
+    brew install neovim
+    ```
+  </Tab>
+  
+  <Tab title="Ubuntu (PPA)">
+    ```bash
+    sudo add-apt-repository ppa:neovim-ppa/unstable
+    sudo apt update
+    sudo apt install neovim
+    ```
+  </Tab>
+  
+  <Tab title="Build from source">
+    ```bash
+    git clone https://github.com/neovim/neovim
+    cd neovim
+    make CMAKE_BUILD_TYPE=Release
+    sudo make install
+    ```
+  </Tab>
+</Tabs>
+
+**Problem:** LSP servers not working.
+
+The config uses Mason for LSP management. Open Neovim and run:
+
+```vim
+:Mason
+```
+
+Install required language servers (e.g., `lua_ls`, `tsserver`, `pyright`).
+
+### fzf fuzzy finder
+
+**Problem:** fzf command not found in Zsh.
+
+```bash
+# Install fzf
+brew install fzf  # macOS
+sudo apt install fzf  # Ubuntu/Debian
+
+# Run the install script
+$(brew --prefix)/opt/fzf/install  # macOS
+/usr/share/doc/fzf/examples/install  # Linux
+```
+
+### NVM (Node Version Manager)
+
+**Problem:** NVM not loading or Node.js not found.
+
+```bash
+# Install NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+# Install Node.js
+nvm install --lts
+nvm use --lts
+```
+
+<Note>
+  The `.zshrc` includes NVM initialization for macOS Homebrew installations. Adjust paths if needed.
+</Note>
+
+## OS-specific issues
+
+### macOS
+
+**Problem:** AeroSpace not working.
+
+```bash
+# Install AeroSpace
+brew install --cask nikitabobko/tap/aerospace
+
+# Grant accessibility permissions
+# System Preferences > Security & Privacy > Accessibility > Add AeroSpace
+```
+
+**Problem:** Homebrew paths not working.
+
+The config expects Homebrew in `/opt/homebrew` (Apple Silicon) or `/usr/local` (Intel). Verify:
+
+```bash
+which brew
+# Should show /opt/homebrew/bin/brew or /usr/local/bin/brew
+```
+
+If different, update paths in `.zshrc` and `aerospace.toml`.
+
+**Problem:** `openssh` or `nvm` paths incorrect.
+
+The `.zshrc` includes Homebrew-specific paths:
+
+```bash ~/.zshrc:159
+export PATH="/opt/homebrew/opt/openssh/bin:$PATH"
+```
+
+Comment out if not using Homebrew or adjust to your installation path.
+
+### Linux (i3)
+
+**Problem:** Wallpaper not loading.
+
+The i3 config expects a wallpaper at:
+
+```bash ~/.config/i3/config:262
+exec_always --no-startup-id feh --bg-fill ~/Pictures/wallpapers/chainsaw-man-power-red-ultrawide-wallpaper-4k.jpg
+```
+
+Either:
+- Place your wallpaper at this path, or
+- Update the path to your preferred wallpaper
+
+**Problem:** Lock screen not working.
+
+Ensure the lock script exists and is executable:
+
+```bash
+ls -l ~/.config/i3/lock.sh
+chmod +x ~/.config/i3/lock.sh
+```
+
+**Problem:** Screenshots directory doesn't exist.
+
+```bash
+mkdir -p ~/Pictures/Screenshots
+```
+
+**Problem:** Display manager not showing i3 session.
+
+Verify i3 desktop entry exists:
+
+```bash
+ls /usr/share/xsessions/i3.desktop
+```
+
+If missing, reinstall i3 or create manually.
+
+### Wayland issues
+
+**Problem:** WezTerm or Picom issues on Wayland.
+
+The WezTerm config disables Wayland for Nvidia compatibility:
+
+```lua ~/.config/wezterm/wezterm.lua:5
+config.enable_wayland = false
+```
+
+If you're not using Nvidia, try enabling it:
+
+```lua
+config.enable_wayland = true
+```
+
+## Performance issues
+
+### Slow shell startup
+
+**Problem:** Zsh takes too long to start.
+
+**Diagnose:**
+
+```bash
+# Profile Zsh startup
+time zsh -i -c exit
+
+# Detailed profiling
+zsh -xv 2>&1 | ts -i '%.s'
+```
+
+**Solutions:**
+
+<Steps>
+  <Step title="Disable instant prompt temporarily">
+    In `.zshrc:4-6`, comment out instant prompt if it causes issues:
+    ```bash
+    # if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    #   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+    # fi
+    ```
+  </Step>
+  
+  <Step title="Remove unused plugins">
+    Disable plugins you don't use from the `plugins` array in `.zshrc:80-84`.
+  </Step>
+  
+  <Step title="Optimize NVM loading">
+    Use lazy loading for NVM (loads only when needed):
+    ```bash
+    # Replace NVM loading with lazy version
+    alias nvm="unalias nvm; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; nvm $@"
+    ```
+  </Step>
+</Steps>
+
+### i3 performance
+
+**Problem:** Screen tearing or poor performance.
+
+**Check Picom backend:**
+
+```bash ~/.config/picom/picom.conf:217
+backend = "xrender";  # Try "glx" for better performance with GPU
+```
+
+**Enable VSync:**
+
+```bash
+vsync = true;  # Line 226
+```
+
+### High memory usage
+
+**Problem:** Compositor using too much RAM.
+
+Disable expensive effects in `picom.conf`:
+
+```bash
+fading = false  # Line 76
+blur-kern = ""  # Comment out line 192
+```
+
+## Configuration errors
+
+### i3 config won't load
+
+**Validate config syntax:**
+
+```bash
+i3 -C -c ~/.config/i3/config
+```
+
+Fix any reported errors before reloading.
+
+### WezTerm Lua errors
+
+**Check config syntax:**
+
+```bash
+wezterm --config-file ~/.config/wezterm/wezterm.lua
+```
+
+Common issues:
+- Missing commas in Lua tables
+- Incorrect font names (must match system fonts exactly)
+- Invalid color scheme names
+
+### Neovim plugin errors
+
+**Reset plugin state:**
+
+```bash
+# Remove lazy.nvim data
+rm -rf ~/.local/share/nvim
+rm -rf ~/.cache/nvim
+
+# Restart Neovim - plugins will reinstall
+nvim
+```
+
+## Getting help
+
+If you're still experiencing issues:
+
+1. Check the [dotfiles repository issues](https://github.com/jassuwu/dotfiles/issues)
+2. Review application-specific documentation:
+   - [i3 User's Guide](https://i3wm.org/docs/userguide.html)
+   - [WezTerm Documentation](https://wezfurlong.org/wezterm/)
+   - [AeroSpace Guide](https://nikitabobko.github.io/AeroSpace/guide)
+   - [Neovim Documentation](https://neovim.io/doc/)
+3. Enable verbose logging to diagnose issues
+
+<Tip>
+  When reporting issues, include your OS, package versions, and relevant error messages.
+</Tip>

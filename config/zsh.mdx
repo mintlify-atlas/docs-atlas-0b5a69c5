@@ -1,0 +1,224 @@
+---
+title: ZSH configuration
+description: ZSH setup with Powerlevel10k theme, Oh My Zsh, and custom aliases
+---
+
+## Overview
+
+The ZSH configuration uses [Oh My Zsh](https://ohmyz.sh/) as the framework and [Powerlevel10k](https://github.com/romkatv/powerlevel10k) as the theme, providing a fast and customizable shell experience.
+
+## Oh My Zsh
+
+### Installation path
+
+Oh My Zsh is installed at `~/.oh-my-zsh`:
+
+```bash .zshrc
+export ZSH="$HOME/.oh-my-zsh"
+```
+
+### Theme
+
+The configuration uses Powerlevel10k theme:
+
+```bash
+ZSH_THEME="powerlevel10k/powerlevel10k"
+```
+
+<Note>
+  Powerlevel10k configuration is stored in `.p10k.zsh`. Run `p10k configure` to customize the prompt.
+</Note>
+
+## Plugins
+
+Three essential plugins are enabled:
+
+```bash .zshrc
+plugins=(
+  git
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+)
+```
+
+<CardGroup cols={3}>
+  <Card title="git" icon="git">
+    Git aliases and functions for common operations
+  </Card>
+  <Card title="zsh-autosuggestions" icon="lightbulb">
+    Fish-like autosuggestions based on command history
+  </Card>
+  <Card title="zsh-syntax-highlighting" icon="highlighter">
+    Syntax highlighting for commands as you type
+  </Card>
+</CardGroup>
+
+### Autosuggestions configuration
+
+Certain dangerous commands are excluded from history suggestions:
+
+```bash
+export ZSH_AUTOSUGGEST_HISTORY_IGNORE="(reboot|rm *)"
+```
+
+## Custom aliases
+
+### Editor aliases
+
+Neovim is aliased as the default editor:
+
+```bash .zshrc
+alias vim="nvim"
+alias vi="nvim"
+```
+
+<Tip>
+  These aliases ensure that typing `vim` or `vi` will always launch Neovim.
+</Tip>
+
+## Runtime managers
+
+### Node Version Manager (NVM)
+
+NVM is configured for managing Node.js versions:
+
+```bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+```
+
+### Bun
+
+Bun runtime is configured with completions:
+
+```bash
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+[ -s "/Users/jass/.bun/_bun" ] && source "/Users/jass/.bun/_bun"
+```
+
+### Go
+
+Go binaries are added to PATH:
+
+```bash
+export PATH=$PATH:/usr/local/go/bin
+```
+
+### Ruby (RVM)
+
+Ruby Version Manager is configured:
+
+```bash
+export PATH="$PATH:$HOME/.rvm/bin"
+```
+
+## Tools integration
+
+### fzf
+
+[fzf](https://github.com/junegunn/fzf) fuzzy finder is integrated with ZSH keybindings:
+
+```bash
+source <(fzf --zsh)
+```
+
+This enables:
+- `Ctrl+R` - Search command history
+- `Ctrl+T` - Search files in current directory
+- `Alt+C` - cd into subdirectory
+
+### fastfetch
+
+fastfetch displays system information on shell startup, but only when opening a terminal in the home directory:
+
+```bash .zshrc
+if command -v fastfetch >/dev/null 2>&1 && [[ "$PWD" == "$HOME" ]]; then
+  fastfetch --logo-type auto --separator ":" --color-keys blue --logo-width 40 --pipe false
+fi
+```
+
+<Info>
+  This prevents fastfetch from running every time you open a new shell in a subdirectory, reducing clutter.
+</Info>
+
+## Powerlevel10k configuration
+
+### Instant prompt
+
+Powerlevel10k instant prompt is enabled for faster shell startup:
+
+```bash
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+```
+
+### Customization
+
+The prompt is configured via `.p10k.zsh`. To reconfigure:
+
+<Steps>
+  <Step title="Run configuration wizard">
+    ```bash
+    p10k configure
+    ```
+  </Step>
+  <Step title="Answer prompts">
+    Follow the interactive prompts to customize your prompt style, icons, and segments.
+  </Step>
+  <Step title="Save configuration">
+    Your choices will be saved to `~/.p10k.zsh`.
+  </Step>
+</Steps>
+
+### Color scheme
+
+Powerlevel10k uses the Snazzy color scheme with these key colors:
+
+```bash .p10k.zsh
+local grey='242'
+local red='#FF5C57'
+local yellow='#F3F99D'
+local blue='#57C7FF'
+local magenta='#FF6AC1'
+local cyan='#9AEDFE'
+local white='#F1F1F0'
+```
+
+## PATH configuration
+
+The configuration adds several directories to PATH:
+
+| Path | Purpose |
+|------|--------|
+| `$BUN_INSTALL/bin` | Bun runtime binaries |
+| `/usr/local/go/bin` | Go binaries |
+| `/opt/homebrew/opt/openssh/bin` | OpenSSH (macOS) |
+| `$HOME/.rvm/bin` | Ruby Version Manager |
+
+<Warning>
+  On macOS, Homebrew paths are used. On Linux, adjust paths to match your package manager's installation locations.
+</Warning>
+
+## File locations
+
+- **Main config**: `~/.zshrc`
+- **Powerlevel10k config**: `~/.p10k.zsh`
+- **Oh My Zsh**: `~/.oh-my-zsh/`
+- **Custom plugins**: `~/.oh-my-zsh/custom/plugins/`
+
+## Best practices
+
+<Accordion title="Keep instant prompt fast">
+  Don't add slow commands before the instant prompt block at the top of `.zshrc`. These will delay your prompt.
+</Accordion>
+
+<Accordion title="Use plugin-specific configs">
+  Configure plugins in their respective sections rather than at the end of the file for better organization.
+</Accordion>
+
+<Accordion title="Test new aliases">
+  After adding new aliases, run `source ~/.zshrc` to reload the configuration without restarting your shell.
+</Accordion>

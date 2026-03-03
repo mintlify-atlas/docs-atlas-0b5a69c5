@@ -1,0 +1,414 @@
+---
+title: Installation
+description: Step-by-step guide to installing and configuring jassuwu's dotfiles using GNU Stow
+---
+
+This guide will walk you through installing all the prerequisites and deploying the dotfiles to your system.
+
+## Prerequisites
+
+Before installing the dotfiles, ensure you have the required dependencies for your platform.
+
+<Tabs>
+  <Tab title="macOS">
+    ### Required tools
+
+    ```bash
+    # Install Homebrew if not already installed
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    # Install GNU Stow
+    brew install stow
+
+    # Install core utilities
+    brew install neovim git fzf
+
+    # Install WezTerm
+    brew install --cask wezterm
+
+    # Install AeroSpace window manager
+    brew install --cask nikitabobko/tap/aerospace
+    ```
+
+    ### Optional tools
+
+    ```bash
+    # Install Oh My Zsh
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+    # Install Powerlevel10k
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+
+    # Install ZSH plugins
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
+    # Install fastfetch for system info display
+    brew install fastfetch
+
+    # Install Node Version Manager
+    brew install nvm
+
+    # Install Bun
+    curl -fsSL https://bun.sh/install | bash
+    ```
+
+    <Note>
+      AeroSpace requires macOS 13.0 or later. It will automatically start managing your windows once configured.
+    </Note>
+  </Tab>
+
+  <Tab title="Linux">
+    ### Required tools
+
+    **Ubuntu/Debian:**
+    ```bash
+    # Install GNU Stow and core utilities
+    sudo apt update
+    sudo apt install stow neovim git fzf i3 picom
+
+    # Install build essentials for some LSPs
+    sudo apt install build-essential
+    ```
+
+    **Arch Linux:**
+    ```bash
+    # Install GNU Stow and core utilities
+    sudo pacman -S stow neovim git fzf i3-wm picom
+
+    # Install base development tools
+    sudo pacman -S base-devel
+    ```
+
+    ### Optional tools
+
+    ```bash
+    # Install Oh My Zsh
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+    # Install Powerlevel10k
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+
+    # Install ZSH plugins
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
+    # Ubuntu/Debian additional tools
+    sudo apt install maim xclip dunst i3lock i3status thunar feh brightnessctl
+
+    # Arch Linux additional tools
+    sudo pacman -S maim xclip dunst i3lock i3status thunar feh brightnessctl
+
+    # Install fastfetch
+    # Ubuntu/Debian
+    sudo add-apt-repository ppa:zhangsongcui3371/fastfetch
+    sudo apt update
+    sudo apt install fastfetch
+
+    # Arch Linux
+    sudo pacman -S fastfetch
+    ```
+
+    <Warning>
+      If you're using i3, you'll need to create a `~/Pictures/Screenshots` directory for screenshot functionality and configure your wallpaper path in the i3 config.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Installation steps
+
+<Steps>
+  <Step title="Clone the repository">
+    Clone the dotfiles repository to your home directory:
+
+    ```bash
+    git clone https://github.com/jassuwu/dotfiles ~/dotfiles
+    cd ~/dotfiles
+    ```
+
+    <Note>
+      The repository must be cloned to `~/dotfiles` or you'll need to adjust paths in some configuration files (particularly i3's lock script path).
+    </Note>
+  </Step>
+
+  <Step title="Review configurations">
+    Before deploying, review the configuration files to ensure they match your preferences:
+
+    ```bash
+    # Check Neovim config
+    cat .config/nvim/init.lua
+
+    # Check ZSH config
+    cat .zshrc
+
+    # Check WezTerm config
+    cat .config/wezterm/wezterm.lua
+
+    # Check i3 config (Linux)
+    cat .config/i3/config
+
+    # Check AeroSpace config (macOS)
+    cat .config/aerospace/aerospace.toml
+    ```
+
+    **Common customizations:**
+    - WezTerm font (currently set to `Comic Code Ligatures`)
+    - i3 wallpaper path
+    - AeroSpace app assignments
+    - ZSH aliases
+  </Step>
+
+  <Step title="Deploy with GNU Stow">
+    GNU Stow creates symlinks from the repository to your home directory.
+
+    **Deploy all configurations:**
+    ```bash
+    cd ~/dotfiles
+    stow .
+    ```
+
+    **Or deploy selectively:**
+    ```bash
+    # Deploy only Neovim config
+    stow -t ~ .config/nvim
+
+    # Deploy only ZSH configs
+    stow -t ~ .zshrc .p10k.zsh
+
+    # Deploy only WezTerm
+    stow -t ~ .config/wezterm
+
+    # Deploy only i3 (Linux)
+    stow -t ~ .config/i3 .config/picom
+
+    # Deploy only AeroSpace (macOS)
+    stow -t ~ .config/aerospace
+    ```
+
+    <Warning>
+      If you have existing configuration files, Stow will refuse to overwrite them. Back up your existing configs first:
+      
+      ```bash
+      mv ~/.config/nvim ~/.config/nvim.backup
+      mv ~/.zshrc ~/.zshrc.backup
+      ```
+    </Warning>
+  </Step>
+
+  <Step title="Install Neovim plugins">
+    The configuration uses lazy.nvim which will automatically install plugins on first launch:
+
+    ```bash
+    nvim
+    ```
+
+    Wait for lazy.nvim to install all plugins. On first launch, you'll see:
+    1. Lazy.nvim cloning itself
+    2. All plugins being installed
+    3. Mason installing language servers
+
+    This may take a few minutes depending on your internet connection.
+  </Step>
+
+  <Step title="Configure platform-specific settings">
+    <Tabs>
+      <Tab title="macOS">
+        **Set up AeroSpace:**
+
+        AeroSpace will start automatically at login. To start it immediately:
+
+        ```bash
+        # AeroSpace should auto-start, but you can launch manually
+        open -a AeroSpace
+        ```
+
+        **Adjust app assignments:**
+
+        Edit `~/.config/aerospace/aerospace.toml` to match your installed apps:
+
+        ```toml
+        [[on-window-detected]]
+            if.app-id = 'com.github.wez.wezterm'
+            run = 'move-node-to-workspace T'
+        ```
+
+        Find app IDs using:
+        ```bash
+        osascript -e 'id of app "AppName"'
+        ```
+
+        **Configure NVM path:**
+
+        The .zshrc expects NVM at `/opt/homebrew/opt/nvm`. Verify the path:
+        ```bash
+        ls /opt/homebrew/opt/nvm/nvm.sh
+        ```
+      </Tab>
+
+      <Tab title="Linux">
+        **Set up i3:**
+
+        1. Create required directories:
+        ```bash
+        mkdir -p ~/Pictures/Screenshots
+        mkdir -p ~/Pictures/wallpapers
+        ```
+
+        2. Set your wallpaper:
+        ```bash
+        # Download or copy your wallpaper
+        cp /path/to/your/wallpaper.jpg ~/Pictures/wallpapers/
+
+        # Update i3 config
+        # Edit line 262 in ~/.config/i3/config
+        ```
+
+        3. Make the lock script executable:
+        ```bash
+        chmod +x ~/.config/i3/lock.sh
+        ```
+
+        4. Create i3status config if using custom status:
+        ```bash
+        # The i3 config references ~/.config/i3/i3status.conf
+        # Create it if you want custom status bar configuration
+        ```
+
+        **Log out and select i3 as your window manager** from your display manager login screen.
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Reload shell configuration">
+    Apply the ZSH configuration:
+
+    ```bash
+    source ~/.zshrc
+    ```
+
+    If this is your first time using Powerlevel10k, you'll be prompted to configure it:
+
+    ```bash
+    p10k configure
+    ```
+
+    Follow the interactive wizard to customize your prompt appearance.
+  </Step>
+</Steps>
+
+## Verification
+
+Verify your installation:
+
+```bash
+# Check Neovim version and config
+nvim --version
+nvim +checkhealth
+
+# Check ZSH plugins loaded
+echo $ZSH_CUSTOM
+
+# Verify stow symlinks
+ls -la ~/.config/nvim
+ls -la ~/.zshrc
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Neovim plugins not installing">
+    If lazy.nvim doesn't automatically install plugins:
+
+    ```bash
+    # Open Neovim and run
+    :Lazy install
+    
+    # For LSP servers
+    :Mason
+    ```
+
+    Check plugin installation logs:
+    ```bash
+    :Lazy log
+    ```
+  </Accordion>
+
+  <Accordion title="Stow conflicts with existing files">
+    If Stow reports conflicts:
+
+    ```bash
+    # Backup existing configs
+    mkdir ~/config-backup
+    mv ~/.config/nvim ~/config-backup/
+    mv ~/.zshrc ~/config-backup/
+    
+    # Try stow again
+    cd ~/dotfiles
+    stow .
+    ```
+
+    Or use `stow --adopt` to merge (use with caution):
+    ```bash
+    stow --adopt .
+    ```
+  </Accordion>
+
+  <Accordion title="Font rendering issues">
+    If you see missing icons or broken characters:
+
+    1. Install a Nerd Font:
+    ```bash
+    # macOS
+    brew tap homebrew/cask-fonts
+    brew install font-fira-code-nerd-font
+    
+    # Linux - download from https://www.nerdfonts.com/
+    ```
+
+    2. Update WezTerm config:
+    ```lua
+    config.font = wezterm.font('FiraCode Nerd Font')
+    ```
+  </Accordion>
+
+  <Accordion title="LSP servers not working">
+    If language servers aren't functioning:
+
+    ```bash
+    # Open Neovim and check Mason
+    :Mason
+    
+    # Manually install a language server
+    :MasonInstall lua-language-server
+    
+    # Check LSP logs
+    :LspLog
+    
+    # Check LSP status
+    :LspInfo
+    ```
+  </Accordion>
+
+  <Accordion title="i3 won't start (Linux)">
+    Check i3 configuration:
+
+    ```bash
+    # Validate i3 config
+    i3 -C
+    
+    # Check i3 log
+    cat ~/.local/share/i3/i3log
+    ```
+
+    Common issues:
+    - Missing dependencies (picom, feh, dunst)
+    - Invalid wallpaper path
+    - Lock script not executable
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+Once installation is complete, check out the [quick setup guide](/quick-setup) to configure language-specific features and customize your environment.
+
+For detailed configuration of individual tools, see their respective sections in the documentation.

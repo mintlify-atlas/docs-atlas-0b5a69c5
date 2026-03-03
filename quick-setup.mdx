@@ -1,0 +1,462 @@
+---
+title: Quick setup
+description: Get your development environment up and running quickly with essential configurations and keybindings
+---
+
+This guide helps you get productive quickly with the essential configurations and keybindings you need to know.
+
+## First-time setup checklist
+
+<Steps>
+  <Step title="Install language runtimes">
+    Install the programming language runtimes you'll be using:
+
+    <Tabs>
+      <Tab title="Node.js / TypeScript">
+        ```bash
+        # Using NVM (already configured in .zshrc)
+        nvm install --lts
+        nvm use --lts
+        
+        # Or using Bun (faster alternative)
+        bun --version  # Should already be in PATH
+        ```
+
+        The Neovim config includes `ts_ls` and `tailwindcss` language servers that will activate automatically.
+      </Tab>
+
+      <Tab title="Python">
+        ```bash
+        # Install Python 3
+        # macOS
+        brew install python3
+        
+        # Linux
+        sudo apt install python3 python3-pip  # Ubuntu/Debian
+        sudo pacman -S python python-pip      # Arch
+        ```
+
+        The `pyright` language server will activate for Python files automatically.
+      </Tab>
+
+      <Tab title="Go">
+        ```bash
+        # macOS
+        brew install go
+        
+        # Linux - download from golang.org or:
+        sudo pacman -S go  # Arch
+        ```
+
+        The .zshrc already adds Go to your PATH:
+        ```bash
+        export PATH=$PATH:/usr/local/go/bin
+        ```
+
+        The `gopls` language server will activate for Go files.
+      </Tab>
+
+      <Tab title="Elixir">
+        ```bash
+        # macOS
+        brew install elixir
+        
+        # Linux
+        sudo apt install elixir  # Ubuntu/Debian
+        sudo pacman -S elixir    # Arch
+        ```
+
+        The `elixirls` language server will activate for Elixir files.
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Configure Powerlevel10k">
+    If you haven't already configured Powerlevel10k during installation:
+
+    ```bash
+    p10k configure
+    ```
+
+    The wizard will guide you through:
+    - Icon style
+    - Prompt style
+    - Colors
+    - Additional features
+
+    Your choices are saved to `~/.p10k.zsh` (already deployed via Stow).
+  </Step>
+
+  <Step title="Set up Git integration">
+    The config includes Neogit and Gitsigns for Git integration:
+
+    ```bash
+    # Configure Git identity if not already set
+    git config --global user.name "Your Name"
+    git config --global user.email "your.email@example.com"
+    ```
+
+    Neogit is available in Neovim, and ZSH includes the git plugin for command aliases.
+  </Step>
+
+  <Step title="Customize keybindings (optional)">
+    Review and customize keybindings in:
+    - Neovim: `~/.config/nvim/lua/remap.lua`
+    - i3: `~/.config/i3/config`
+    - AeroSpace: `~/.config/aerospace/aerospace.toml`
+  </Step>
+</Steps>
+
+## Essential keybindings
+
+### Neovim keybindings
+
+The configuration uses space as the leader key.
+
+#### LSP keybindings
+
+| Keybinding | Action |
+|------------|--------|
+| `gd` | Go to definition |
+| `K` | Hover documentation |
+| `<leader>vws` | Workspace symbol search |
+| `<leader>vd` | Open diagnostic float |
+| `<leader>vca` | Code action |
+| `<leader>vrr` | Find references |
+| `<leader>vrn` | Rename symbol |
+| `Ctrl-h` (insert) | Signature help |
+| `[d` | Next diagnostic |
+| `]d` | Previous diagnostic |
+
+#### Telescope (fuzzy finder)
+
+| Keybinding | Action |
+|------------|--------|
+| `Ctrl-p` | Find files |
+| `<leader>ff` | Live grep (search in files) |
+| `<leader>vh` | Help tags |
+
+#### Completion (nvim-cmp)
+
+| Keybinding | Action |
+|------------|--------|
+| `Ctrl-p` | Previous completion |
+| `Ctrl-n` | Next completion |
+| `Ctrl-y` | Confirm selection |
+| `Ctrl-Space` | Trigger completion |
+
+<Note>
+  The leader key is `Space` by default in Neovim. All `<leader>` keybindings require pressing Space first.
+</Note>
+
+### Window manager keybindings
+
+<Tabs>
+  <Tab title="i3 (Linux)">
+    The modifier key is the Windows/Super key (`Mod4`).
+
+    #### Basic window management
+
+    | Keybinding | Action |
+    |------------|--------|
+    | `Mod+Enter` | Open terminal |
+    | `Mod+w` | Launch browser (Chrome) |
+    | `Mod+e` | Launch file manager (Thunar) |
+    | `Mod+d` | Program launcher (dmenu) |
+    | `Mod+Shift+q` | Kill focused window |
+
+    #### Navigation
+
+    | Keybinding | Action |
+    |------------|--------|
+    | `Mod+Arrow` | Focus window in direction |
+    | `Mod+Shift+Arrow` | Move window in direction |
+    | `Mod+1-9,0` | Switch to workspace |
+    | `Mod+Shift+1-9,0` | Move window to workspace |
+
+    #### Layout
+
+    | Keybinding | Action |
+    |------------|--------|
+    | `Mod+h` | Split horizontal |
+    | `Mod+v` | Split vertical |
+    | `Mod+f` | Fullscreen toggle |
+    | `Mod+s` | Stacking layout |
+    | `Mod+Shift+w` | Tabbed layout |
+    | `Mod+Shift+e` | Toggle split layout |
+    | `Mod+r` | Resize mode |
+
+    #### System
+
+    | Keybinding | Action |
+    |------------|--------|
+    | `Mod+l` | Lock mode (then `l` to lock, `s` to suspend) |
+    | `Print` | Screenshot full screen |
+    | `Mod+Print` | Screenshot active window |
+    | `Shift+Print` | Screenshot selection |
+    | `Ctrl+Print` | Screenshot to clipboard |
+    | `XF86MonBrightness` | Brightness control |
+    | `XF86Audio*` | Volume/media controls |
+
+    <Warning>
+      The lock script expects i3lock to be installed. Install it via your package manager if you plan to use the lock functionality.
+    </Warning>
+  </Tab>
+
+  <Tab title="AeroSpace (macOS)">
+    AeroSpace uses `Alt/Option` as the primary modifier.
+
+    #### Window management
+
+    | Keybinding | Action |
+    |------------|--------|
+    | `Alt+Ctrl+Shift+f` | Fullscreen |
+    | `Alt+Ctrl+f` | Toggle floating/tiling |
+    | `Alt+/` | Toggle horizontal/vertical tiles |
+    | `Alt+,` | Toggle accordion layout |
+
+    #### Navigation (Vim-style)
+
+    | Keybinding | Action |
+    |------------|--------|
+    | `Alt+h/j/k/l` | Focus window (left/down/up/right) |
+    | `Alt+Shift+h/j/k/l` | Move window |
+    | `Alt+Shift+-` | Resize smaller |
+    | `Alt+Shift+=` | Resize larger |
+
+    #### App-specific workspaces
+
+    | Keybinding | Action |
+    |------------|--------|
+    | `Alt+t` | Switch to Terminal workspace + launch WezTerm |
+    | `Alt+b` | Switch to Browser workspace + launch Arc |
+    | `Alt+c` | Switch to Code workspace + launch Cursor |
+    | `Alt+o` | Switch to Obsidian workspace |
+    | `Alt+f` | Switch to Finder workspace |
+    | `Alt+1-9,0` | Switch to numbered workspace |
+
+    #### Moving windows
+
+    | Keybinding | Action |
+    |------------|--------|
+    | `Alt+Shift+t/b/c/o/f` | Move window to app workspace |
+    | `Alt+Shift+1-9,0` | Move window to numbered workspace |
+    | `Alt+Tab` | Workspace back-and-forth |
+    | `Alt+Shift+Tab` | Move workspace to next monitor |
+
+    #### Service mode
+
+    | Keybinding | Action |
+    |------------|--------|
+    | `Alt+Shift+;` | Enter service mode |
+    | `Esc` (in service) | Reload config |
+    | `r` (in service) | Reset layout |
+    | `f` (in service) | Toggle floating |
+    | `Backspace` (in service) | Close all windows except current |
+
+    <Note>
+      AeroSpace automatically assigns apps to workspaces. Edit `~/.config/aerospace/aerospace.toml` to customize app assignments.
+    </Note>
+  </Tab>
+</Tabs>
+
+### ZSH aliases
+
+The .zshrc includes useful aliases:
+
+```bash
+alias vim="nvim"
+alias vi="nvim"
+```
+
+The git plugin provides many aliases:
+
+```bash
+gst      # git status
+gaa      # git add --all
+gcmsg    # git commit -m
+ggpush   # git push origin current branch
+ggpull   # git pull origin current branch
+```
+
+View all git aliases:
+```bash
+alias | grep git
+```
+
+## Testing your setup
+
+<CodeGroup>
+```bash Test Neovim LSP
+# Create a test file
+echo 'console.log("hello")' > test.js
+
+# Open with Neovim
+nvim test.js
+
+# You should see:
+# - Syntax highlighting (Treesitter)
+# - LSP status in bottom right (ts_ls)
+# - Autocompletion when typing (Ctrl+Space)
+
+# Try hovering over 'console' with K
+# Try going to definition with gd
+```
+
+```bash Test Telescope
+# Open Neovim in a project
+cd ~/your-project
+nvim
+
+# Press Ctrl+p to open file finder
+# Press <leader>ff for live grep
+# Type to search, Enter to open file
+```
+
+```bash Test ZSH features
+# Test autosuggestions - start typing a previous command
+ls
+# Now type 'l' and you should see 'ls' suggested in gray
+
+# Test syntax highlighting
+# Valid commands appear in one color, invalid in another
+
+# Test fzf
+Ctrl+r  # Search command history
+```
+</CodeGroup>
+
+## Common workflows
+
+### Starting a new project
+
+<Steps>
+  <Step title="Navigate to project">
+    ```bash
+    cd ~/projects/my-new-project
+    ```
+  </Step>
+
+  <Step title="Open Neovim">
+    ```bash
+    nvim .
+    ```
+
+    Mason will automatically install required language servers based on file types.
+  </Step>
+
+  <Step title="Initialize Git (if needed)">
+    ```bash
+    git init
+    ```
+
+    Use Neogit inside Neovim for Git operations.
+  </Step>
+</Steps>
+
+### Switching between projects
+
+**Using AeroSpace (macOS):**
+```bash
+# Assign different projects to different workspaces
+Alt+1  # Project 1
+Alt+2  # Project 2
+Alt+3  # Project 3
+```
+
+**Using i3 (Linux):**
+```bash
+# Use workspaces for different projects
+Mod+1  # Project 1
+Mod+2  # Project 2
+Mod+3  # Project 3
+```
+
+### Code editing workflow
+
+1. **Find files:** `Ctrl+p` in Neovim
+2. **Search content:** `<leader>ff` for live grep
+3. **Navigate code:** `gd` for definitions, `K` for docs
+4. **Edit:** LSP provides autocompletion automatically
+5. **Format:** Conform.nvim handles formatting (configured in `conform.lua`)
+6. **Git:** Use Neogit or ZSH git aliases
+
+## Customization tips
+
+### Change Neovim color scheme
+
+Edit `~/.config/nvim/lua/plugins/colors.lua`:
+
+```lua
+-- Change from rose-pine to catppuccin
+PaintMeThePicture("catppuccin-mocha")
+
+-- Or tokyo-night
+PaintMeThePicture("tokyonight")
+```
+
+### Change WezTerm font
+
+Edit `~/.config/wezterm/wezterm.lua`:
+
+```lua
+-- Current:
+config.font = wezterm.font('Comic Code Ligatures')
+
+-- Change to:
+config.font = wezterm.font('FiraCode Nerd Font')
+-- Or:
+config.font = wezterm.font('JetBrains Mono')
+```
+
+### Add ZSH aliases
+
+Edit `~/.zshrc` at the bottom:
+
+```bash
+## CUSTOM ALIASES
+alias vim="nvim"
+alias vi="nvim"
+
+# Add your own:
+alias ll="ls -la"
+alias ..="cd .."
+alias projects="cd ~/projects"
+```
+
+Reload:
+```bash
+source ~/.zshrc
+```
+
+### Add Neovim LSP servers
+
+Edit `~/.config/nvim/lua/plugins/lsp-config.lua`:
+
+```lua
+require("mason-lspconfig").setup({
+  ensure_installed = {
+    "lua_ls",
+    "gopls",
+    -- Add more:
+    "rust_analyzer",  # Rust
+    "jdtls",          # Java
+    -- etc.
+  },
+})
+```
+
+Restart Neovim and Mason will install the new servers.
+
+## Next steps
+
+You're now ready to use the full development environment! Explore the individual configuration sections for advanced customization:
+
+- Neovim configuration deep dive
+- Window manager advanced features
+- ZSH plugin ecosystem
+- Terminal multiplexer integration
+
+<Note>
+  Remember to commit your customizations back to your fork of the dotfiles repo so you can deploy them on other machines!
+</Note>

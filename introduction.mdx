@@ -1,0 +1,176 @@
+---
+title: Introduction
+description: A curated collection of dotfiles for a modern development environment with Neovim, ZSH, and tiling window managers
+---
+
+Welcome to jassuwu's dotfiles - a carefully crafted development environment that combines powerful tools with the elegant Rosé Pine color scheme.
+
+This repository contains battle-tested configuration files for essential development tools, all managed with GNU Stow for easy deployment and version control.
+
+## What's included
+
+<CardGroup cols={2}>
+  <Card
+    title="Neovim with LSP"
+    icon="code"
+    href="#neovim-configuration"
+  >
+    Modern Lua-based configuration with Mason LSP manager, Telescope fuzzy finder, and Treesitter syntax highlighting
+  </Card>
+  
+  <Card
+    title="ZSH shell"
+    icon="terminal"
+    href="#zsh-configuration"
+  >
+    Powerlevel10k theme with Oh My Zsh, featuring autosuggestions, syntax highlighting, and fzf integration
+  </Card>
+  
+  <Card
+    title="WezTerm terminal"
+    icon="window"
+    href="#wezterm-configuration"
+  >
+    GPU-accelerated terminal emulator with Rosé Pine theme, custom tab bar, and transparency effects
+  </Card>
+  
+  <Card
+    title="Tiling window managers"
+    icon="grip"
+    href="#window-managers"
+  >
+    i3 for Linux with custom Rosé Pine theme and AeroSpace for macOS with app-specific workspaces
+  </Card>
+</CardGroup>
+
+## Neovim configuration
+
+A modern Neovim setup powered by lazy.nvim plugin manager with comprehensive LSP support:
+
+**Language servers included:**
+- lua_ls (Lua)
+- gopls (Go)
+- clangd (C/C++)
+- ts_ls & tailwindcss (TypeScript/JavaScript)
+- pyright (Python)
+- elixirls (Elixir)
+
+**Key plugins:**
+- Telescope for fuzzy finding
+- Treesitter for syntax highlighting
+- nvim-cmp for autocompletion
+- Neogit for Git integration
+- Conform for code formatting
+
+The configuration uses Rosé Pine as the default color scheme with a transparent background.
+
+## ZSH configuration
+
+Enhanced shell experience with:
+
+```bash
+# Core features
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+plugins=(
+  git
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+)
+```
+
+**Features:**
+- Powerlevel10k instant prompt for fast startup
+- Smart history ignoring for dangerous commands
+- fzf integration for fuzzy search
+- NVM, Bun, and Go path configurations
+- fastfetch display on terminal launch
+
+## WezTerm configuration
+
+A feature-rich terminal configuration:
+
+```lua
+config.color_scheme = "Rosé Pine (Gogh)"
+config.window_background_opacity = 0.8
+config.font = wezterm.font('Comic Code Ligatures')
+config.font_size = 14.0
+```
+
+**Highlights:**
+- Rosé Pine color scheme
+- Custom tab bar styling at bottom
+- 80% opacity with blur effect on macOS
+- 144 FPS support
+- Disabled audible bell
+
+## Window managers
+
+### i3 (Linux)
+
+Full Rosé Pine themed i3 configuration with:
+
+- Custom color palette matching Rosé Pine
+- Picom compositor for transparency and effects
+- i3status bar with custom colors
+- Lock mode with i3lock integration
+- Screenshot bindings using maim
+- Media key support
+
+### AeroSpace (macOS)
+
+Tiling window manager for macOS with:
+
+- App-specific workspaces (T for Terminal, B for Browser, C for Code, etc.)
+- Automatic window assignment to workspaces
+- Vim-style navigation (hjkl)
+- 10px gaps between windows
+- Persistent workspaces
+
+## Philosophy
+
+This dotfiles setup prioritizes:
+
+1. **Consistency** - Rosé Pine color scheme across all tools
+2. **Productivity** - LSP support, fuzzy finding, and tiling windows
+3. **Portability** - GNU Stow makes deployment simple
+4. **Maintainability** - Well-organized configuration files
+
+## Getting started
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/jassuwu/dotfiles ~/dotfiles
+    cd ~/dotfiles
+    ```
+  </Step>
+  
+  <Step title="Install GNU Stow">
+    ```bash
+    # macOS
+    brew install stow
+    
+    # Ubuntu/Debian
+    sudo apt install stow
+    
+    # Arch Linux
+    sudo pacman -S stow
+    ```
+  </Step>
+  
+  <Step title="Deploy configurations">
+    ```bash
+    # Deploy all configs
+    stow .
+    
+    # Or deploy specific configs
+    stow .config/nvim
+    stow .config/wezterm
+    ```
+  </Step>
+</Steps>
+
+For detailed installation instructions and prerequisites, see the [installation guide](/installation).
+
+For a quick setup to get everything running, check out the [quick setup guide](/quick-setup).

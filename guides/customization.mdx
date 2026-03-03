@@ -1,0 +1,337 @@
+---
+title: Customization
+description: Learn how to customize colors, fonts, keybindings, and add your own configurations to the dotfiles
+---
+
+This guide walks you through customizing various aspects of the dotfiles to match your preferences and workflow.
+
+## Color schemes
+
+### i3 window manager
+
+The i3 configuration uses the Rosé Pine color scheme. Colors are defined at the top of the config file:
+
+```bash ~/.config/i3/config
+set $base           #191724
+set $surface        #1f1d2e
+set $overlay        #26233a
+set $text           #e0def4
+set $love           #eb6f92
+set $rose           #ebbcba
+set $pine           #31748f
+set $foam           #9ccfd8
+```
+
+To change the color scheme:
+
+<Steps>
+  <Step title="Edit color variables">
+    Open `~/.config/i3/config` and modify the color variables at lines 19-34 with your preferred hex colors.
+  </Step>
+  
+  <Step title="Update window decorations">
+    The window border colors are set at lines 37-43. Adjust the `client.focused`, `client.unfocused`, and other values to use your new colors.
+  </Step>
+  
+  <Step title="Update status bar">
+    Modify the bar colors section (lines 241-251) to match your theme.
+  </Step>
+  
+  <Step title="Reload configuration">
+    Press `Mod+Shift+R` to reload i3 and apply your changes.
+  </Step>
+</Steps>
+
+### WezTerm terminal
+
+WezTerm is configured to use the "Rosé Pine (Gogh)" color scheme with transparency:
+
+```lua ~/.config/wezterm/wezterm.lua
+config.color_scheme = "Rosé Pine (Gogh)"
+config.window_background_opacity = 0.8
+config.macos_window_background_blur = 10
+```
+
+To change themes:
+
+1. Browse available color schemes at [WezTerm Color Schemes](https://wezfurlong.org/wezterm/colorschemes/index.html)
+2. Update the `color_scheme` value in `~/.config/wezterm/wezterm.lua:21`
+3. Adjust opacity (0.0-1.0) and blur values to your preference
+
+<Note>
+  You can also define custom tab bar colors in the `config.colors.tab_bar` section (lines 26-45).
+</Note>
+
+### Powerlevel10k prompt
+
+The Zsh prompt colors are defined in `.p10k.zsh:40-47`:
+
+```bash ~/.p10k.zsh
+local red='#FF5C57'
+local yellow='#F3F99D'
+local blue='#57C7FF'
+local magenta='#FF6AC1'
+local cyan='#9AEDFE'
+```
+
+Modify these hex values to change prompt colors, then run `source ~/.zshrc` to apply.
+
+## Fonts
+
+### Terminal font
+
+WezTerm is configured with Comic Code Ligatures. To change it:
+
+```lua ~/.config/wezterm/wezterm.lua
+-- Change this line (currently at line 15)
+config.font = wezterm.font('Your Font Name')
+config.font_size = 14.0  -- Adjust size as needed
+```
+
+Alternative fonts already commented in the config:
+- `FiraCode Nerd Font` - Popular monospace font with ligatures
+- `Mx437_IBM_BIOS` - Retro 1:1 font
+
+<Tip>
+  Make sure the font is installed on your system. Nerd Fonts are recommended for icon support.
+</Tip>
+
+### i3 window manager font
+
+The i3 window titles use Pango font at size 9:
+
+```bash ~/.config/i3/config
+font pango:monospace 9
+```
+
+Change `monospace` to your preferred font family and adjust the size.
+
+## Keybindings
+
+### i3 window manager
+
+The modifier key is set to the Super/Windows key:
+
+```bash ~/.config/i3/config
+set $mod Mod4
+```
+
+<Tabs>
+  <Tab title="Common keybindings">
+    - `$mod+Return` - Open terminal
+    - `$mod+W` - Launch browser (Chrome)
+    - `$mod+E` - Open Thunar file manager
+    - `$mod+D` - Application launcher (dmenu)
+    - `$mod+Shift+Q` - Kill focused window
+    - `$mod+F` - Fullscreen toggle
+  </Tab>
+  
+  <Tab title="Window navigation">
+    - `$mod+Arrow keys` - Focus windows
+    - `$mod+Shift+Arrow keys` - Move windows
+    - `$mod+H/V` - Split horizontal/vertical
+    - `$mod+R` - Enter resize mode
+  </Tab>
+  
+  <Tab title="Workspaces">
+    - `$mod+1-9,0` - Switch to workspace
+    - `$mod+Shift+1-9,0` - Move window to workspace
+  </Tab>
+  
+  <Tab title="System">
+    - `$mod+L` - Lock screen mode
+    - `$mod+Shift+C` - Reload config
+    - `$mod+Shift+R` - Restart i3
+    - `$mod+Shift+X` - Exit i3
+  </Tab>
+</Tabs>
+
+To customize keybindings, edit the `bindsym` lines in `~/.config/i3/config`. For example:
+
+```bash
+# Change browser keybinding from Mod+W to Mod+B
+bindsym $mod+b exec google-chrome-stable
+```
+
+### AeroSpace (macOS)
+
+AeroSpace uses Alt-based keybindings. Key customizations in `~/.config/aerospace/aerospace.toml:121-218`:
+
+```toml
+# Window focus
+alt-h = 'focus left'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus right'
+
+# App-specific workspaces
+alt-t = ['workspace T', 'exec-and-forget open -a /Applications/WezTerm.app']
+alt-b = ['workspace B', 'exec-and-forget open -a /Applications/Arc.app']
+```
+
+<Warning>
+  After changing AeroSpace keybindings, reload the config with `Alt+Shift+;` then `Esc`.
+</Warning>
+
+### Neovim
+
+Neovim keybindings use Space as the leader key:
+
+```lua ~/.config/nvim/lua/remap.lua
+vim.g.mapleader = " "
+
+-- File explorer
+vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+
+-- Move lines in visual mode
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+
+-- Yank to system clipboard
+vim.keymap.set({"n", "v"}, "<leader>y", [["+y]])
+```
+
+Add custom keybindings to `~/.config/nvim/lua/remap.lua` following the same pattern.
+
+## Adding new configurations
+
+### Adding a new application config
+
+<Steps>
+  <Step title="Create config directory">
+    Create a directory for your application in the source folder:
+    ```bash
+    mkdir -p ~/dotfiles/.config/yourapp
+    ```
+  </Step>
+  
+  <Step title="Add configuration files">
+    Place your config files in the new directory:
+    ```bash
+    cp ~/.config/yourapp/config.conf ~/dotfiles/.config/yourapp/
+    ```
+  </Step>
+  
+  <Step title="Commit to git">
+    Track the new files:
+    ```bash
+    cd ~/dotfiles
+    git add .config/yourapp
+    git commit -m "Add yourapp configuration"
+    ```
+  </Step>
+  
+  <Step title="Deploy with Stow">
+    The configuration will be automatically symlinked on the next machine when you run:
+    ```bash
+    stow .
+    ```
+  </Step>
+</Steps>
+
+### Adding shell aliases
+
+Custom aliases are defined in `.zshrc:132-135`. Add your own:
+
+```bash ~/.zshrc
+## CUSTOM ALIASES
+alias vim="nvim"
+alias vi="nvim"
+alias ll="ls -lah"
+alias gc="git commit"
+```
+
+### Adding startup applications
+
+For i3, add exec commands to `~/.config/i3/config`:
+
+```bash
+# Start applications on i3 startup
+exec --no-startup-id spotify
+exec --no-startup-id discord
+```
+
+For autostart on login, use the `exec_always` directive or add to `.zshrc` for terminal-based tools.
+
+## Picom compositor effects
+
+Customize window effects in `~/.config/picom/picom.conf`:
+
+### Shadows
+
+```bash ~/.config/picom/picom.conf
+shadow = true;
+shadow-radius = 7;        # Increase for softer shadows
+shadow-offset-x = -7;     # Horizontal offset
+shadow-offset-y = -7;     # Vertical offset
+```
+
+### Transparency
+
+```bash
+inactive-opacity = 0.95;  # Transparency for unfocused windows (0.1-1.0)
+frame-opacity = 0.9;      # Window border opacity
+```
+
+### Rounded corners
+
+```bash
+corner-radius = 0         # Set to 8-12 for rounded corners
+```
+
+<Note>
+  Restart picom after changes: `pkill picom && picom --config ~/.config/picom/picom.conf -b`
+</Note>
+
+## Workspace customization
+
+### i3 workspace names
+
+Rename workspaces with custom labels:
+
+```bash ~/.config/i3/config
+set $ws1 "1:Web"
+set $ws2 "2:Code"
+set $ws3 "3:Terminal"
+```
+
+### AeroSpace persistent workspaces
+
+Define which workspaces always exist:
+
+```toml ~/.config/aerospace/aerospace.toml
+persistent-workspaces = ["T", "B", "C", "O", "F", "1", "2", "3"]
+```
+
+### Auto-assign applications to workspaces
+
+In AeroSpace config:
+
+```toml
+[[on-window-detected]]
+    if.app-id = 'com.spotify.client'
+    run = 'move-node-to-workspace M'  # M for Music
+```
+
+Find app IDs with: `aerospace list-apps`
+
+## Oh-My-Zsh plugins
+
+Plugins are configured in `.zshrc:80-84`:
+
+```bash
+plugins=(
+    git
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+    # Add more plugins here
+)
+```
+
+To add plugins:
+
+1. Clone the plugin to `~/.oh-my-zsh/custom/plugins/` (for custom plugins)
+2. Add the plugin name to the array
+3. Run `source ~/.zshrc`
+
+Popular plugins: `docker`, `kubectl`, `npm`, `node`, `python`, `rust`

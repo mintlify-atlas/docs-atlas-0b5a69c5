@@ -1,0 +1,486 @@
+---
+title: FAQ
+description: Frequently asked questions about the dotfiles setup, customization, and usage
+---
+
+Answers to common questions about using and customizing these dotfiles.
+
+## General questions
+
+<Accordion title="What is GNU Stow and why is it used?">
+  GNU Stow is a symlink manager that creates symbolic links from a source directory to a target directory. It's used for dotfiles management because:
+
+  - **No custom scripts needed** - Uses standard Unix tools
+  - **Easy to manage** - Simple `stow` and `stow -D` commands
+  - **Version control friendly** - All configs in one organized directory
+  - **Safe** - Won't overwrite files without warning
+  - **Portable** - Works across Linux and macOS
+
+  When you run `stow .` from the dotfiles directory, it creates symlinks in your home directory that point back to the repository, keeping everything synchronized.
+</Accordion>
+
+<Accordion title="Can I use only parts of these dotfiles?">
+  Yes! You can selectively apply configurations. Instead of stowing everything:
+
+  ```bash
+  # Stow only specific config directories
+  stow --no-folding -t ~ .config/nvim
+  stow --no-folding -t ~ .config/wezterm
+  ```
+
+  Or manually copy only the configurations you want:
+
+  ```bash
+  cp -r ~/dotfiles/.config/nvim ~/.config/
+  ```
+
+  The `--no-folding` flag prevents Stow from symlinking entire directories, giving you more granular control.
+</Accordion>
+
+<Accordion title="What's the difference between the i3 and AeroSpace configs?">
+  These are window managers for different operating systems:
+
+  - **i3** (`~/.config/i3/`) - For Linux with X11. A tiling window manager that requires manual configuration of everything from keybindings to status bars.
+  
+  - **AeroSpace** (`~/.config/aerospace/`) - For macOS. A tiling window manager that works alongside the native macOS window system.
+
+  You only need the one for your operating system. The dotfiles include both so they work across different machines.
+</Accordion>
+
+<Accordion title="Why are there multiple shell configuration files?">
+  The dotfiles include:
+
+  - **`.zshrc`** - Main Zsh configuration (plugins, aliases, environment variables)
+  - **`.p10k.zsh`** - Powerlevel10k theme configuration (prompt appearance)
+
+  Zsh reads `.zshrc` on startup, which then sources `.p10k.zsh` for the prompt theme. This separation keeps the theme config from cluttering the main shell config.
+</Accordion>
+
+<Accordion title="Do I need all the dependencies installed?">
+  It depends on what you want to use:
+
+  **Essential for basic functionality:**
+  - GNU Stow (for deployment)
+  - Zsh and Oh-My-Zsh (for shell config)
+  - Your terminal emulator of choice
+
+  **Optional based on what you use:**
+  - i3/AeroSpace (window managers)
+  - Neovim (text editor config)
+  - WezTerm (terminal emulator)
+  - picom, feh, maim (Linux desktop utilities)
+  - fzf, NVM (shell enhancements)
+
+  The configs are modular - missing dependencies will simply result in those specific features not working.
+</Accordion>
+
+## Installation questions
+
+<Accordion title="What if I already have existing dotfiles?">
+  Stow will warn you about conflicts. You have several options:
+
+  1. **Backup and merge** (recommended):
+     ```bash
+     mkdir ~/dotfiles_backup
+     mv ~/.zshrc ~/.config/nvim ~/dotfiles_backup/
+     cd ~/dotfiles && stow .
+     # Then manually merge your custom settings
+     ```
+
+  2. **Use version control**:
+     ```bash
+     # Commit your current configs first
+     mv ~/.zshrc ~/.zshrc.bak
+     # Try the new dotfiles
+     # Restore if needed: mv ~/.zshrc.bak ~/.zshrc
+     ```
+
+  3. **Test in a new user account** to preview without affecting your current setup.
+</Accordion>
+
+<Accordion title="How do I update to the latest dotfiles?">
+  Since everything is symlinked, simply pull from the repository:
+
+  ```bash
+  cd ~/dotfiles
+  git pull origin main
+  ```
+
+  Changes take effect immediately for most configs. For configs that need reloading:
+
+  - **Zsh**: Run `source ~/.zshrc` or restart your terminal
+  - **i3**: Press `Mod+Shift+R` to reload
+  - **AeroSpace**: Press `Alt+Shift+;` then `Esc`
+  - **Neovim**: Restart Neovim
+  - **WezTerm**: Automatically reloads when config changes
+</Accordion>
+
+<Accordion title="Can I fork this repository and make it my own?">
+  Absolutely! That's the recommended approach:
+
+  ```bash
+  # Fork the repository on GitHub, then:
+  git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/dotfiles
+  cd ~/dotfiles
+  stow .
+  
+  # Make your customizations
+  vim ~/.config/nvim/init.lua
+  
+  # Commit your changes
+  cd ~/dotfiles
+  git add .
+  git commit -m "Customize Neovim config"
+  git push
+  ```
+
+  Now your dotfiles are version controlled and you can deploy them on any machine.
+</Accordion>
+
+<Accordion title="How do I uninstall these dotfiles?">
+  Unstow removes all symlinks:
+
+  ```bash
+  cd ~/dotfiles
+  stow -D .  # Remove all symlinks
+  ```
+
+  This leaves the repository intact but disconnects it from your home directory. To completely remove:
+
+  ```bash
+  stow -D .
+  cd ~
+  rm -rf ~/dotfiles
+  ```
+
+  Your original configs (if backed up) can then be restored.
+</Accordion>
+
+## Customization questions
+
+<Accordion title="How do I change the color scheme across all applications?">
+  The dotfiles use Rosé Pine theme across multiple applications, but they're configured separately:
+
+  1. **i3**: Edit color variables in `~/.config/i3/config` (lines 19-34)
+  2. **WezTerm**: Change `color_scheme` in `~/.config/wezterm/wezterm.lua` (line 21)
+  3. **Powerlevel10k**: Edit colors in `~/.p10k.zsh` (lines 40-47)
+  4. **Neovim**: Color scheme is set in `~/.config/nvim/lua/plugins/colors.lua`
+
+  For a cohesive look, choose colors from the same palette for all applications. Check [terminal.sexy](https://terminal.sexy/) or [coolors.co](https://coolors.co/) for palette generators.
+</Accordion>
+
+<Accordion title="Can I use a different terminal instead of WezTerm?">
+  Yes! The WezTerm config is optional. Popular alternatives:
+
+  - **Alacritty**: Fast, GPU-accelerated, YAML config
+  - **Kitty**: Feature-rich, image support
+  - **iTerm2**: macOS only, highly customizable
+  - **GNOME Terminal**: Simple, pre-installed on many Linux distros
+
+  The shell configuration (`.zshrc`, `.p10k.zsh`) works with any terminal emulator. Just install your preferred terminal and the Zsh config will work the same.
+</Accordion>
+
+<Accordion title="How do I add my own shell aliases and functions?">
+  Add them to the custom section in `.zshrc` (after line 132):
+
+  ```bash
+  ## CUSTOM ALIASES
+  alias vim="nvim"
+  alias vi="nvim"
+  
+  # Your additions:
+  alias gs="git status"
+  alias gp="git push"
+  alias ll="ls -lah"
+  
+  # Custom functions
+  mkcd() {
+    mkdir -p "$1" && cd "$1"
+  }
+  ```
+
+  Then reload: `source ~/.zshrc`
+
+  Since `.zshrc` is symlinked, changes are automatically tracked in the repository.
+</Accordion>
+
+<Accordion title="How do I change the modifier key in i3 or AeroSpace?">
+  **For i3**, edit line 13 in `~/.config/i3/config`:
+
+  ```bash
+  set $mod Mod4  # Super/Windows key (default)
+  # set $mod Mod1  # Alt key
+  ```
+
+  Then reload i3 with `Mod+Shift+R`.
+
+  **For AeroSpace**, keybindings use `alt` by default. To use a different modifier, you'd need to replace all instances in `~/.config/aerospace/aerospace.toml`:
+
+  ```bash
+  # Find and replace in the file
+  :%s/alt-/cmd-/g  # Change to Cmd key in vim
+  ```
+
+  Note: Extensive rebinding in AeroSpace may conflict with macOS system shortcuts.
+</Accordion>
+
+<Accordion title="Can I use a different Neovim configuration (like LazyVim or NvChad)?">
+  Yes! The Neovim config is completely independent. To use a different config:
+
+  ```bash
+  # Remove the symlink
+  rm ~/.config/nvim
+  
+  # Install your preferred config
+  git clone https://github.com/LazyVim/starter ~/.config/nvim
+  ```
+
+  Or keep both:
+
+  ```bash
+  # Use NVIM_APPNAME to switch configs
+  alias nvim-lazy="NVIM_APPNAME=nvim-lazy nvim"
+  alias nvim-chad="NVIM_APPNAME=nvim-chad nvim"
+  ```
+
+  Just don't stow the Neovim config if you want to use a different one.
+</Accordion>
+
+## Usage questions
+
+<Accordion title="What's the 'fastfetch' command that runs on terminal startup?">
+  Fastfetch displays system information with ASCII art when you open a terminal in your home directory. It's configured in `.zshrc:148-156`:
+
+  ```bash
+  if command -v fastfetch >/dev/null 2>&1 && [[ "$PWD" == "$HOME" ]]; then
+    fastfetch --logo-type auto --separator ":" --color-keys blue
+  fi
+  ```
+
+  To disable it: Comment out or remove lines 148-156 in `.zshrc`
+
+  To install it:
+  - macOS: `brew install fastfetch`
+  - Ubuntu/Debian: `sudo apt install fastfetch`
+  - Arch: `sudo pacman -S fastfetch`
+</Accordion>
+
+<Accordion title="How do the i3 lock screen shortcuts work?">
+  Press `Mod+L` to enter lock mode, then:
+
+  - **L** - Lock screen immediately (i3lock)
+  - **S** - Suspend system (screen locks automatically via `lock.sh`)
+  - **Esc/Enter** - Cancel and return to normal mode
+
+  The lock script (`~/.config/i3/lock.sh`) is called by `xss-lock` before suspend/hibernate. It should contain:
+
+  ```bash
+  #!/bin/bash
+  i3lock --ignore-empty-password --tiling -c 000000
+  ```
+
+  Make sure it's executable: `chmod +x ~/.config/i3/lock.sh`
+</Accordion>
+
+<Accordion title="What are the i3status bar modules showing?">
+  The i3status bar (configured in `~/.config/i3/i3status.conf`) displays:
+
+  - **Wireless**: WiFi connection quality and IP address
+  - **Battery**: Status and charge percentage (line 26-35)
+  - **CPU Temperature**: Current temp in Celsius (line 50-53)
+  - **Memory**: RAM usage (line 55-59)
+  - **Load**: System load average (line 46-48)
+  - **Volume**: Audio volume level (line 69-75)
+  - **Time**: Local time and Calcutta timezone (line 36-44)
+
+  You can reorder, remove, or add modules by editing the `order +=` lines (6-14).
+</Accordion>
+
+<Accordion title="How do I take screenshots in i3?">
+  Screenshot keybindings (configured in `~/.config/i3/config:269-276`):
+
+  **Save to file** (`~/Pictures/Screenshots/`):
+  - `Print` - Full screen
+  - `Mod+Print` - Active window
+  - `Shift+Print` - Select area
+
+  **Copy to clipboard**:
+  - `Ctrl+Print` - Full screen
+  - `Ctrl+Mod+Print` - Active window
+  - `Ctrl+Shift+Print` - Select area
+
+  Requires `maim` and `xclip` to be installed.
+</Accordion>
+
+<Accordion title="What are the workspace assignments in AeroSpace?">
+  AeroSpace uses letter-based workspaces for apps:
+
+  - **T** - Terminal (WezTerm)
+  - **B** - Browser (Arc)
+  - **C** - Code (Cursor editor)
+  - **O** - Obsidian (notes)
+  - **F** - Finder (file manager)
+  - **1-10** - Numbered workspaces for other apps
+
+  Apps automatically move to their assigned workspace when opened. You can customize these in `~/.config/aerospace/aerospace.toml:89-107`.
+</Accordion>
+
+## Troubleshooting questions
+
+<Accordion title="Why is my Zsh prompt not showing colors/icons correctly?">
+  This usually means you need a Nerd Font installed:
+
+  ```bash
+  # Install a Nerd Font
+  brew tap homebrew/cask-fonts
+  brew install --cask font-fira-code-nerd-font
+  ```
+
+  Then configure your terminal to use it:
+  - **WezTerm**: Already configured in the dotfiles
+  - **Other terminals**: Set font to "FiraCode Nerd Font" in preferences
+
+  If colors are wrong, ensure your terminal supports 24-bit true color. Test with:
+
+  ```bash
+  curl -s https://gist.githubusercontent.com/lifepillar/09a44b8cf0f9397465614e622979107f/raw/24-bit-color.sh | bash
+  ```
+</Accordion>
+
+<Accordion title="Neovim plugins aren't loading or giving errors">
+  The config uses lazy.nvim for plugin management. To fix:
+
+  1. **Let plugins install**: On first launch, lazy.nvim downloads all plugins. Wait for it to complete.
+
+  2. **Check for errors**: Open Neovim and run `:Lazy` to see plugin status
+
+  3. **Install LSP servers**: Run `:Mason` and install language servers for your languages
+
+  4. **Reset if needed**:
+     ```bash
+     rm -rf ~/.local/share/nvim
+     rm -rf ~/.cache/nvim
+     nvim  # Plugins will reinstall
+     ```
+
+  5. **Check Neovim version**: Requires Neovim 0.9+
+     ```bash
+     nvim --version
+     ```
+</Accordion>
+
+<Accordion title="i3 says 'command not found' for some keybindings">
+  This means the application isn't installed. Common ones:
+
+  - `google-chrome-stable` (line 93): Install Chrome or change to `firefox`/`chromium`
+  - `thunar` (line 96): Install Thunar or use `nautilus`/`dolphin`
+  - `maim` (screenshots): `sudo apt install maim`
+  - `brightnessctl` (brightness): `sudo apt install brightnessctl`
+
+  Edit `~/.config/i3/config` to replace with applications you have installed.
+</Accordion>
+
+<Accordion title="WezTerm config errors about 'enable_wayland' or 'max_fps'">
+  Some options are OS/build specific:
+
+  - **`enable_wayland`**: Only available on Linux builds with Wayland support. Comment out if you get errors (line 5).
+  - **`max_fps`**: Only needed for X11, not Wayland/macOS. Comment out if not needed (line 7).
+  - **`macos_window_background_blur`**: macOS only, remove on Linux (line 24).
+
+  WezTerm shows helpful error messages. Read them to identify which lines to comment out for your system.
+</Accordion>
+
+<Accordion title="Where are the application logs if something goes wrong?">
+  Common log locations:
+
+  - **i3**: `~/.local/share/xorg/Xorg.0.log` and stderr on restart
+  - **picom**: Run manually to see errors: `picom --config ~/.config/picom/picom.conf`
+  - **Neovim**: `:messages` shows recent messages, `:checkhealth` diagnoses issues
+  - **Zsh**: Add `-x` flag to trace: `zsh -x`
+  - **WezTerm**: Shows errors in terminal when config is invalid
+
+  For debugging, run applications from terminal to see error output instead of launching from GUI.
+</Accordion>
+
+## Advanced questions
+
+<Accordion title="Can I sync these dotfiles across multiple machines with different OSes?">
+  Yes! That's a main benefit of this setup. Strategy:
+
+  1. **Keep OS-specific configs separate**: i3 for Linux, AeroSpace for macOS
+  2. **Use conditional loading in shell**:
+     ```bash
+     if [[ "$OSTYPE" == "darwin"* ]]; then
+       # macOS-specific config
+     else
+       # Linux-specific config
+     fi
+     ```
+
+  3. **Stow only what you need**:
+     ```bash
+     # Linux machine
+     stow --no-folding -t ~ .config/i3 .config/picom
+     
+     # macOS machine
+     stow --no-folding -t ~ .config/aerospace
+     ```
+
+  4. **Use git branches** for machine-specific tweaks:
+     ```bash
+     git checkout -b laptop  # Laptop-specific settings
+     git checkout -b workstation
+     ```
+</Accordion>
+
+<Accordion title="How do I add secrets/private configs without committing them?">
+  Use `.gitignore` and separate private files:
+
+  1. **Create a private config file**:
+     ```bash
+     touch ~/.zshrc.private
+     echo '.zshrc.private' >> ~/dotfiles/.gitignore
+     ```
+
+  2. **Source it in .zshrc**:
+     ```bash
+     # Add to end of .zshrc
+     [ -f ~/.zshrc.private ] && source ~/.zshrc.private
+     ```
+
+  3. **Store secrets there**:
+     ```bash
+     # ~/.zshrc.private (not tracked)
+     export GITHUB_TOKEN="ghp_..."
+     export AWS_SECRET_KEY="..."
+     ```
+
+  Now your secrets are loaded but never committed.
+</Accordion>
+
+<Accordion title="What's the best way to test config changes before committing?">
+  Use git branches for experimentation:
+
+  ```bash
+  cd ~/dotfiles
+  git checkout -b test-new-theme
+  
+  # Make changes to configs
+  vim .config/i3/config
+  
+  # Test them (configs are symlinked, so changes take effect immediately)
+  # i3: Mod+Shift+R to reload
+  # zsh: source ~/.zshrc
+  
+  # If you like it, commit and merge:
+  git add .
+  git commit -m "Update i3 theme"
+  git checkout main
+  git merge test-new-theme
+  
+  # If you don't like it, just switch back:
+  git checkout main  # Reverts symlinked files
+  ```
+
+  The symlinks mean config changes are live immediately, and git makes it easy to revert.
+</Accordion>

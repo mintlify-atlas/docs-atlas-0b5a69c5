@@ -1,0 +1,297 @@
+---
+title: Window manager configuration
+description: i3 window manager for Linux and AeroSpace for macOS configurations
+---
+
+## Overview
+
+This configuration includes two window managers:
+- **i3** - Tiling window manager for Linux
+- **AeroSpace** - Tiling window manager for macOS
+
+Both use vim-style keybindings and share similar workflows for consistent experience across platforms.
+
+## i3 (Linux)
+
+### Configuration location
+
+The i3 configuration is at `.config/i3/config`.
+
+### Rosé Pine color scheme
+
+i3 uses the Rosé Pine color palette throughout:
+
+```i3config
+set $base           #191724
+set $surface        #1f1d2e
+set $overlay        #26233a
+set $muted          #6e6a86
+set $subtle         #908caa
+set $text           #e0def4
+set $love           #eb6f92
+set $gold           #f6c177
+set $rose           #ebbcba
+set $pine           #31748f
+set $foam           #9ccfd8
+set $iris           #c4a7e7
+```
+
+### Window theming
+
+Window borders and title bars use Rosé Pine colors:
+
+```i3config
+client.focused           $rose     $base $text  $rose
+client.focused_inactive  $text     $base $text  $subtle
+client.unfocused         $text     $base $text  $overlay   $overlay
+client.urgent            $text     $base $text  $love      $love
+```
+
+### Keybindings
+
+The modifier key is set to the Windows/Super key:
+
+```i3config
+set $mod Mod4
+```
+
+#### Core bindings
+
+| Key | Action |
+|-----|--------|
+| `$mod+Return` | Open terminal |
+| `$mod+Shift+q` | Kill focused window |
+| `$mod+d` | Open application launcher (dmenu) |
+| `$mod+w` | Launch browser (Chrome) |
+| `$mod+e` | Launch file manager (Thunar) |
+
+#### Window navigation
+
+<Tabs>
+  <Tab title="Vim keys">
+    | Key | Action |
+    |-----|--------|
+    | `$mod+h` | Focus left |
+    | `$mod+j` | Focus down |
+    | `$mod+k` | Focus up |
+    | `$mod+l` | Focus right |
+  </Tab>
+  <Tab title="Arrow keys">
+    | Key | Action |
+    |-----|--------|
+    | `$mod+Left` | Focus left |
+    | `$mod+Down` | Focus down |
+    | `$mod+Up` | Focus up |
+    | `$mod+Right` | Focus right |
+  </Tab>
+</Tabs>
+
+#### Moving windows
+
+| Key | Action |
+|-----|--------|
+| `$mod+Shift+h` | Move window left |
+| `$mod+Shift+j` | Move window down |
+| `$mod+Shift+k` | Move window up |
+| `$mod+Shift+l` | Move window right |
+
+#### Layout management
+
+| Key | Action |
+|-----|--------|
+| `$mod+b` | Split horizontal |
+| `$mod+v` | Split vertical |
+| `$mod+f` | Toggle fullscreen |
+| `$mod+s` | Stacking layout |
+| `$mod+w` | Tabbed layout |
+| `$mod+e` | Toggle split layout |
+| `$mod+Shift+space` | Toggle floating |
+
+#### Workspaces
+
+| Key | Action |
+|-----|--------|
+| `$mod+1` to `$mod+0` | Switch to workspace 1-10 |
+| `$mod+Shift+1` to `$mod+Shift+0` | Move window to workspace 1-10 |
+
+### Lock screen
+
+i3 includes a custom lock screen with suspend functionality:
+
+```bash
+bindsym $mod+l mode "lock"
+mode "lock" {
+    bindsym l exec i3lock --ignore-empty-password --tiling -c 000000 2>/dev/null, mode "default"
+    bindsym s exec --no-startup-id sleep 1 && xset dpms force suspend , mode "default"
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+```
+
+Press `$mod+l` then:
+- `l` - Lock screen
+- `s` - Suspend system
+- `Escape`/`Return` - Cancel
+
+### Audio controls
+
+PulseAudio volume control via media keys:
+
+```i3config
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10%
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10%
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+```
+
+### Status bar
+
+i3status provides system information in the bar. Configuration is at `.config/i3/i3status.conf`.
+
+## AeroSpace (macOS)
+
+### Configuration location
+
+The AeroSpace configuration is at `.config/aerospace/aerospace.toml`.
+
+### General settings
+
+```toml
+config-version = 2
+start-at-login = true
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+```
+
+### Gaps
+
+AeroSpace uses consistent gaps between windows:
+
+```toml
+[gaps]
+inner.horizontal = 10
+inner.vertical = 10
+outer.left = 10
+outer.bottom = 10
+outer.top = 10
+outer.right = 10
+```
+
+### Workspaces
+
+AeroSpace uses letter-based workspaces for apps plus numbered workspaces:
+
+```toml
+persistent-workspaces = ["T", "B", "C", "O", "F", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+```
+
+<CardGroup cols={3}>
+  <Card title="T" icon="terminal">
+    Terminal (WezTerm)
+  </Card>
+  <Card title="B" icon="browser">
+    Browser
+  </Card>
+  <Card title="C" icon="comments">
+    Communication (Slack)
+  </Card>
+</CardGroup>
+
+### Auto-assignment
+
+Apps are automatically moved to specific workspaces:
+
+```toml
+[[on-window-detected]]
+if.app-id = 'com.github.wez.wezterm'
+run = 'move-node-to-workspace T'
+
+[[on-window-detected]]
+if.app-id = 'company.thebrowser.Browser'
+run = 'move-node-to-workspace B'
+
+[[on-window-detected]]
+if.app-id = 'com.todesktop.230313mzl4w4u92'
+run = 'move-node-to-workspace C'
+```
+
+### Keybindings
+
+AeroSpace uses Alt as the main modifier:
+
+#### Window focus (Vim bindings)
+
+| Key | Action |
+|-----|--------|
+| `Alt+h` | Focus left |
+| `Alt+j` | Focus down |
+| `Alt+k` | Focus up |
+| `Alt+l` | Focus right |
+
+#### Move windows
+
+| Key | Action |
+|-----|--------|
+| `Alt+Shift+h` | Move left |
+| `Alt+Shift+j` | Move down |
+| `Alt+Shift+k` | Move up |
+| `Alt+Shift+l` | Move right |
+
+#### Workspace switching
+
+| Key | Action |
+|-----|--------|
+| `Alt+t` | Switch to Terminal workspace |
+| `Alt+b` | Switch to Browser workspace |
+| `Alt+c` | Switch to Communication workspace |
+| `Alt+1` to `Alt+0` | Switch to workspace 1-10 |
+
+#### Layout
+
+| Key | Action |
+|-----|--------|
+| `Alt+s` | Change layout to horizontal |
+| `Alt+v` | Change layout to vertical |
+| `Alt+f` | Toggle fullscreen |
+| `Alt+Shift+space` | Toggle floating |
+
+### Mouse behavior
+
+Mouse follows focus when switching monitors:
+
+```toml
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+```
+
+### Multi-monitor
+
+Workspace 10 is assigned to secondary monitor:
+
+```toml
+[workspace-to-monitor-force-assignment]
+10 = 'secondary'
+```
+
+## Comparison
+
+| Feature | i3 (Linux) | AeroSpace (macOS) |
+|---------|------------|-------------------|
+| **Modifier key** | Super/Win (`Mod4`) | Alt/Option |
+| **Focus navigation** | Vim keys (h/j/k/l) | Vim keys (h/j/k/l) |
+| **Workspaces** | Numbers 1-10 | Letters + Numbers |
+| **Auto-tiling** | Yes | Yes |
+| **Gaps** | Via i3-gaps | Built-in |
+| **Status bar** | i3status | macOS menu bar |
+| **Lock screen** | i3lock | macOS native |
+
+<Note>
+  Both configurations prioritize keyboard-driven workflows and maintain similar navigation patterns for easy context switching between Linux and macOS.
+</Note>
+
+## Additional files
+
+- `.config/i3/lock.sh` - Custom lock screen script for i3
+- `.config/i3/i3status.conf` - Status bar configuration
+
+<Tip>
+  After deploying the configs, reload i3 with `$mod+Shift+r` or restart AeroSpace from the menu bar.
+</Tip>

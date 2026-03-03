@@ -1,0 +1,268 @@
+---
+title: Terminal configuration
+description: WezTerm terminal emulator setup with Rosé Pine theme and custom styling
+---
+
+## Overview
+
+The terminal configuration uses [WezTerm](https://wezfurlong.org/wezterm/), a GPU-accelerated cross-platform terminal emulator written in Rust. It's configured with the Rosé Pine color scheme and optimized for both Linux and macOS.
+
+## Configuration file
+
+The WezTerm configuration is located at `.config/wezterm/wezterm.lua` and uses Lua for configuration:
+
+```lua
+local wezterm = require("wezterm")
+local config = wezterm.config_builder()
+```
+
+## Display settings
+
+### Graphics backend
+
+Wayland is disabled due to compatibility issues with NVIDIA:
+
+```lua wezterm.lua
+config.enable_wayland = false
+config.max_fps = 144
+```
+
+<Note>
+  On Linux with NVIDIA GPUs, Xorg provides better performance and stability than Wayland.
+</Note>
+
+### Font configuration
+
+The default font is Comic Code Ligatures with a size of 14:
+
+```lua
+config.font_size = 14.0
+config.font = wezterm.font('Comic Code Ligatures')
+```
+
+<Tabs>
+  <Tab title="Default (Comic Code)">
+    ```lua
+    config.font = wezterm.font('Comic Code Ligatures')
+    ```
+    A playful monospace font with programming ligatures.
+  </Tab>
+  <Tab title="Alternative: FiraCode">
+    ```lua
+    config.font = wezterm.font('FiraCode Nerd Font')
+    ```
+    Popular programming font with extensive ligature support.
+  </Tab>
+  <Tab title="Retro: IBM BIOS">
+    ```lua
+    config.font = wezterm.font('Mx437_IBM_BIOS')
+    ```
+    1:1 pixel font for that authentic retro terminal look.
+  </Tab>
+</Tabs>
+
+## Color scheme
+
+### Rosé Pine theme
+
+The terminal uses the [Rosé Pine](https://rosepinetheme.com/) color scheme:
+
+```lua
+config.color_scheme = "Rosé Pine (Gogh)"
+```
+
+<CardGroup cols={3}>
+  <Card title="Base" icon="moon">
+    `#191724` - Background
+  </Card>
+  <Card title="Rose" icon="flower">
+    `#ebbcba` - Primary accent
+  </Card>
+  <Card title="Foam" icon="water">
+    `#9ccfd8` - Secondary accent
+  </Card>
+</CardGroup>
+
+### Transparency
+
+Window transparency is set to 80% with blur on macOS:
+
+```lua
+config.window_background_opacity = 0.8
+config.macos_window_background_blur = 10
+```
+
+<Warning>
+  Background blur is only supported on macOS. On Linux, only opacity will be applied.
+</Warning>
+
+## Tab bar
+
+### Tab bar configuration
+
+The tab bar is placed at the bottom with a custom style:
+
+```lua
+config.use_fancy_tab_bar = false
+config.tab_bar_at_bottom = true
+config.show_new_tab_button_in_tab_bar = false
+config.tab_max_width = 1024
+```
+
+### Tab styling
+
+Custom colors for active and inactive tabs:
+
+```lua
+config.colors = {
+  tab_bar = {
+    background = '#222',
+    
+    active_tab = {
+      bg_color = '#000',
+      fg_color = '#fff',
+      intensity = 'Normal',
+      underline = 'None',
+      italic = true,
+      strikethrough = false,
+    },
+    
+    inactive_tab = {
+      bg_color = '#222',
+      fg_color = '#808080',
+      intensity = 'Half'
+    },
+  }
+}
+```
+
+This creates a minimal, dark tab bar where:
+- Active tabs have black background with white text (italic)
+- Inactive tabs have dark gray background with lighter gray text
+- No new tab button is shown
+
+## Window appearance
+
+### Padding
+
+Symmetric padding around the terminal content:
+
+```lua
+config.window_padding = {
+  left = 6,
+  right = 6,
+  top = 6,
+  bottom = 6,
+}
+```
+
+### Bell
+
+Audible bell is disabled:
+
+```lua
+config.audible_bell = "Disabled"
+```
+
+<Tip>
+  Disable the audible bell to avoid annoying beeps when hitting the end of command history or invalid operations.
+</Tip>
+
+## Platform-specific considerations
+
+<Tabs>
+  <Tab title="Linux">
+    - Wayland is disabled for NVIDIA compatibility
+    - Requires Xorg for proper rendering
+    - Background blur not supported
+    - Max FPS set to 144 for smooth rendering
+  </Tab>
+  <Tab title="macOS">
+    - Background blur enabled (10px)
+    - Native macOS window decorations
+    - Better font rendering
+    - GPU acceleration via Metal
+  </Tab>
+</Tabs>
+
+## Complete configuration
+
+Here's the full configuration file:
+
+```lua .config/wezterm/wezterm.lua
+local wezterm = require("wezterm")
+local config = wezterm.config_builder()
+
+-- cuz wayland on nvidia sucks
+config.enable_wayland = false
+config.max_fps = 144
+
+config.font_size = 14.0
+config.font = wezterm.font('Comic Code Ligatures')
+
+config.color_scheme = "Rosé Pine (Gogh)"
+config.window_background_opacity = 0.8
+config.macos_window_background_blur = 10
+
+config.colors = {
+  tab_bar = {
+    background = '#222',
+    active_tab = {
+      bg_color = '#000',
+      fg_color = '#fff',
+      intensity = 'Normal',
+      underline = 'None',
+      italic = true,
+      strikethrough = false,
+    },
+    inactive_tab = {
+      bg_color = '#222',
+      fg_color = '#808080',
+      intensity = 'Half'
+    },
+  }
+}
+
+config.use_fancy_tab_bar = false
+config.tab_bar_at_bottom = true
+config.show_new_tab_button_in_tab_bar = false
+config.tab_max_width = 1024
+
+config.window_padding = {
+  left = 6,
+  right = 6,
+  top = 6,
+  bottom = 6,
+}
+
+config.audible_bell = "Disabled"
+
+return config
+```
+
+## Installation
+
+WezTerm installation varies by platform:
+
+<CodeGroup>
+```bash macOS
+brew install wezterm
+```
+
+```bash Ubuntu/Debian
+curl -LO https://github.com/wez/wezterm/releases/download/latest/wezterm-latest.Ubuntu20.04.deb
+sudo apt install ./wezterm-latest.Ubuntu20.04.deb
+```
+
+```bash Arch Linux
+pacman -S wezterm
+```
+
+```bash Fedora
+sudo dnf install wezterm
+```
+</CodeGroup>
+
+<Info>
+  After installing WezTerm and deploying the config with GNU Stow, the configuration will be automatically loaded on next launch.
+</Info>

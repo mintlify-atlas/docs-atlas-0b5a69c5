@@ -1,0 +1,56 @@
+{
+  "projectType": "general",
+  "projectName": "jassuwu's dotfiles",
+  "projectDescription": "Personal dotfiles for easy replication of development environment setup with GNU Stow",
+  "theme": "mint",
+  "primaryColor": "#ebbcba",
+  "lightColor": "#9ccfd8",
+  "darkColor": "#31748f",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "installation",
+          "quick-setup"
+        ]
+      },
+      {
+        "group": "Configuration",
+        "pages": [
+          "config/neovim",
+          "config/zsh",
+          "config/terminal",
+          "config/window-managers",
+          "config/compositor"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "guides/customization",
+          "guides/troubleshooting",
+          "guides/faq"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Neovim with LSP support for multiple languages",
+    "ZSH with Powerlevel10k and Oh My Zsh",
+    "WezTerm terminal emulator configuration",
+    "i3 and AeroSpace window manager configs",
+    "Consistent Rosé Pine color scheme",
+    "GNU Stow for dotfile management"
+  ],
+  "publicApiSurface": [
+    ".zshrc - ZSH configuration with aliases and plugins",
+    ".p10k.zsh - Powerlevel10k prompt configuration",
+    ".config/nvim - Neovim configuration with Lazy.nvim",
+    ".config/wezterm - WezTerm terminal configuration",
+    ".config/i3 - i3 window manager configuration (Linux)",
+    ".config/aerospace - AeroSpace window manager configuration (macOS)",
+    ".config/picom - Picom compositor configuration"
+  ]
+}
